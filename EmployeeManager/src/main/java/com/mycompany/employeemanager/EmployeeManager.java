@@ -7,12 +7,15 @@ import java.util.*;
 
 public class EmployeeManager {
 
+// This cocde represents employee information
     static class Employee {
         String empNumber, lastName, firstName, birthday, address, phoneNumber;
         String sss, philhealth, tin, pagibig, status, position, supervisor;
         double basicSalary, riceSubsidy, phoneAllowance, clothingAllowance;
         double grossSemiMonthly, hourlyRate;
         double sssDeduction, pagibigDeduction, philhealthDeduction, tax, hmoDeduction, netSalary;
+		
+	//This code reads the data and separates it
 
         public Employee(String[] data) {
             empNumber = data[0];
@@ -34,18 +37,18 @@ public class EmployeeManager {
             clothingAllowance = Double.parseDouble(data[16]);
             computeSalary();
         }
-
+//This computes the deminis and deductions
         void computeSalary() {
             grossSemiMonthly = basicSalary / 2 + riceSubsidy + phoneAllowance + clothingAllowance;
-            hourlyRate = basicSalary / 21 / 8;
+            hourlyRate = basicSalary / 25 / 8;
             sssDeduction = basicSalary * 0.045;
-            pagibigDeduction = 100;
+            pagibigDeduction = -100;
             philhealthDeduction = basicSalary * 0.03;
             tax = basicSalary * 0.1;
-            hmoDeduction = 500;
+            hmoDeduction = -500;
             netSalary = grossSemiMonthly - (sssDeduction + pagibigDeduction + philhealthDeduction + tax + hmoDeduction);
         }
-
+//This displays the text and data for each field grouped by a specific title
         void display() {
             System.out.println("==========================================");
             System.out.println("Employee #: " + empNumber);
@@ -80,7 +83,7 @@ public class EmployeeManager {
 
     public static void main(String[] args) {
         loadEmployees();
-
+//This displays the initial function of asking for instructions
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nEmployee Manager");
@@ -108,7 +111,10 @@ public class EmployeeManager {
             }
         }
     }
-
+/* This code was made by Gavril and his groupmates who helped in
+Researching for this code as well as encoding the data into the text file
+Comments are made individually
+*/
     private static void loadEmployees() {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
                 EmployeeManager.class.getClassLoader().getResourceAsStream("employees.txt")))) {
