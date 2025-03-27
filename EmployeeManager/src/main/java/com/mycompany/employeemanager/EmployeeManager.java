@@ -1,21 +1,16 @@
 package com.mycompany.employeemanager;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class EmployeeManager {
 
-// This cocde represents employee information
     static class Employee {
         String empNumber, lastName, firstName, birthday, address, phoneNumber;
         String sss, philhealth, tin, pagibig, status, position, supervisor;
         double basicSalary, riceSubsidy, phoneAllowance, clothingAllowance;
         double grossSemiMonthly, hourlyRate;
         double sssDeduction, pagibigDeduction, philhealthDeduction, tax, hmoDeduction, netSalary;
-		
-	//This code reads the data and separates it
 
         public Employee(String[] data) {
             empNumber = data[0];
@@ -37,18 +32,18 @@ public class EmployeeManager {
             clothingAllowance = Double.parseDouble(data[16]);
             computeSalary();
         }
-//This computes the deminis and deductions
+
         void computeSalary() {
             grossSemiMonthly = basicSalary / 2 + riceSubsidy + phoneAllowance + clothingAllowance;
-            hourlyRate = basicSalary / 25 / 8;
+            hourlyRate = basicSalary / 21 / 8;
             sssDeduction = basicSalary * 0.045;
-            pagibigDeduction = -100;
+            pagibigDeduction = 100;
             philhealthDeduction = basicSalary * 0.03;
             tax = basicSalary * 0.1;
-            hmoDeduction = -500;
+            hmoDeduction = 500;
             netSalary = grossSemiMonthly - (sssDeduction + pagibigDeduction + philhealthDeduction + tax + hmoDeduction);
         }
-//This displays the text and data for each field grouped by a specific title
+
         void display() {
             System.out.println("==========================================");
             System.out.println("Employee #: " + empNumber);
@@ -77,33 +72,47 @@ public class EmployeeManager {
             System.out.printf("Net Salary: %.2f\n", netSalary);
             System.out.println("==========================================");
         }
+
+        String toFileString() {
+            return String.join(",", empNumber, lastName, firstName, birthday, address, phoneNumber,
+                    sss, philhealth, tin, pagibig, status, position, supervisor,
+                    String.valueOf(basicSalary), String.valueOf(riceSubsidy),
+                    String.valueOf(phoneAllowance), String.valueOf(clothingAllowance));
+        }
     }
 
-    static Map<String, Employee> employeeMap = new HashMap<>();
+    static Map<String, Employee> employeeMap = new LinkedHashMap<>();
+    static final String FILE_PATH = "src/main/resources/employees.txt";
 
     public static void main(String[] args) {
         loadEmployees();
-//This displays the initial function of asking for instructions
+
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\nEmployee Manager");
             System.out.println("[1] Search Employee");
-            System.out.println("[2] Exit");
+            System.out.println("[2] Add Employee");
+            System.out.println("[3] Edit Employee");
+            System.out.println("[4] Delete Employee");
+            System.out.println("[5] Exit");
             System.out.print("Choose an option: ");
             String option = scanner.nextLine();
 
             switch (option) {
                 case "1":
-                    System.out.print("Enter Employee #: ");
-                    String empNo = scanner.nextLine();
-                    Employee emp = employeeMap.get(empNo);
-                    if (emp != null) {
-                        emp.display();
-                    } else {
-                        System.out.println("Employee not found.");
-                    }
+                    searchEmployee(scanner);
                     break;
                 case "2":
+                    addEmployee(scanner);
+                    break;
+                case "3":
+                    editEmployee(scanner);
+                    break;
+                case "4":
+                    deleteEmployee(scanner);
+                    break;
+                case "5":
+                    saveEmployees();
                     System.out.println("Exiting...");
                     return;
                 default:
@@ -111,13 +120,92 @@ public class EmployeeManager {
             }
         }
     }
-/* This code was made by Gavril and his groupmates who helped in
-Researching for this code as well as encoding the data into the text file
-Comments are made individually
-*/
+
+    private static void searchEmployee(Scanner scanner) {
+        System.out.print("Enter Employee #: ");
+        String empNo = scanner.nextLine();
+        Employee emp = employeeMap.get(empNo);
+        if (emp != null) {
+            emp.display();
+        } else {
+            System.out.println("Employee not found.");
+        }
+    }
+
+    private static void addEmployee(Scanner scanner) {
+        try {
+            System.out.println("Enter new employee details:");
+            String[] data = new String[17];
+            System.out.print("Employee #: "); data[0] = scanner.nextLine();
+            System.out.print("Last Name: "); data[1] = scanner.nextLine();
+            System.out.print("First Name: "); data[2] = scanner.nextLine();
+            System.out.print("Birthday: "); data[3] = scanner.nextLine();
+            System.out.print("Address: "); data[4] = scanner.nextLine();
+            System.out.print("Phone Number: "); data[5] = scanner.nextLine();
+            System.out.print("SSS #: "); data[6] = scanner.nextLine();
+            System.out.print("Philhealth #: "); data[7] = scanner.nextLine();
+            System.out.print("TIN #: "); data[8] = scanner.nextLine();
+            System.out.print("Pag-ibig #: "); data[9] = scanner.nextLine();
+            System.out.print("Status: "); data[10] = scanner.nextLine();
+            System.out.print("Position: "); data[11] = scanner.nextLine();
+            System.out.print("Immediate Supervisor: "); data[12] = scanner.nextLine();
+            System.out.print("Basic Salary: "); data[13] = scanner.nextLine();
+            System.out.print("Rice Subsidy: "); data[14] = scanner.nextLine();
+            System.out.print("Phone Allowance: "); data[15] = scanner.nextLine();
+            System.out.print("Clothing Allowance: "); data[16] = scanner.nextLine();
+
+            Employee newEmp = new Employee(data);
+            employeeMap.put(newEmp.empNumber, newEmp);
+            saveEmployees();
+            System.out.println("Employee added successfully.");
+        } catch (Exception e) {
+            System.out.println("Error adding employee: " + e.getMessage());
+        }
+    }
+
+    private static void editEmployee(Scanner scanner) {
+        System.out.print("Enter Employee # to edit: ");
+        String empNo = scanner.nextLine();
+        Employee emp = employeeMap.get(empNo);
+        if (emp != null) {
+            System.out.println("Editing employee: " + empNo);
+            System.out.println("Leave blank to keep current value.");
+
+            System.out.print("Last Name [" + emp.lastName + "]: ");
+            String input = scanner.nextLine();
+            if (!input.isEmpty()) emp.lastName = input;
+
+            System.out.print("First Name [" + emp.firstName + "]: ");
+            input = scanner.nextLine();
+            if (!input.isEmpty()) emp.firstName = input;
+
+            // Repeat for other fields...
+            System.out.print("Basic Salary [" + emp.basicSalary + "]: ");
+            input = scanner.nextLine();
+            if (!input.isEmpty()) emp.basicSalary = Double.parseDouble(input);
+
+            emp.computeSalary();
+            saveEmployees();
+            System.out.println("Employee updated.");
+        } else {
+            System.out.println("Employee not found.");
+        }
+    }
+
+    private static void deleteEmployee(Scanner scanner) {
+        System.out.print("Enter Employee # to delete: ");
+        String empNo = scanner.nextLine();
+        if (employeeMap.containsKey(empNo)) {
+            employeeMap.remove(empNo);
+            saveEmployees();
+            System.out.println("Employee deleted.");
+        } else {
+            System.out.println("Employee not found.");
+        }
+    }
+
     private static void loadEmployees() {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(
-                EmployeeManager.class.getClassLoader().getResourceAsStream("employees.txt")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(FILE_PATH))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
@@ -125,8 +213,20 @@ Comments are made individually
                 employeeMap.put(emp.empNumber, emp);
             }
             System.out.println("Employee data loaded successfully.");
-        } catch (IOException | NullPointerException e) {
+        } catch (IOException e) {
             System.out.println("Error loading employee data: " + e.getMessage());
+        }
+    }
+
+    private static void saveEmployees() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(FILE_PATH))) {
+            for (Employee emp : employeeMap.values()) {
+                bw.write(emp.toFileString());
+                bw.newLine();
+            }
+            System.out.println("Employee data saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error saving employee data: " + e.getMessage());
         }
     }
 }
