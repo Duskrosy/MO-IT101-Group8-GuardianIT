@@ -1,6 +1,6 @@
 # Guardian-IT-Java-Employee
 
-App Name: 
+# App Name: GuardianCore
 
 Group Members:
 Leader: Antoine Gavril Escarcha
