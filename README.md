@@ -8,7 +8,7 @@ Leader: Antoine Gavril Escarcha
 <br>
 Ayesha Eia Kjield Sia
 <br>
-Jennifer Bacatio
+Jennifer Nicerio Bacatio
 <br>
 Martela Nyzza Castro
 <br>
